@@ -1,65 +1,208 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>토박이마을 단체주문 양식 변환기</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #333; background: #f5f5f5; }
-        .container { padding: 2rem; max-width: 1000px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .header { margin-bottom: 2rem; }
-        h1 { font-size: 28px; margin-bottom: 0.5rem; }
-        .subtitle { color: #666; font-size: 14px; }
-        .section { margin-bottom: 2rem; }
-        .section-title { font-size: 16px; font-weight: 600; margin-bottom: 1rem; color: #222; }
-        .tabs { display: flex; gap: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #ddd; }
-        .tab { padding: 12px 16px; background: none; border: none; cursor: pointer; font-size: 14px; color: #666; border-bottom: 2px solid transparent; }
-        .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .upload-area { border: 2px dashed #ddd; border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; background: #fafafa; }
-        .upload-area:hover { border-color: #1a73e8; background: #f0f7ff; }
-        input[type="file"] { display: none; }
-        textarea { width: 100%; height: 200px; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; font-family: monospace; font-size: 13px; }
-        .button { background: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
-        .button:hover { background: #1765cc; }
-        .button-secondary { background: white; color: #1a73e8; border: 1px solid #1a73e8; }
-        .button-secondary:hover { background: #f0f7ff; }
-        .button-success { background: #0f9d58; }
-        .button-success:hover { background: #0d8c4a; }
-        .status { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 14px; display: none; }
-        .status.show { display: block; }
-        .status.success { background: #e6f4ea; color: #0d652d; border-left: 4px solid #0f9d58; }
-        .status.error { background: #fce8e6; color: #740001; border-left: 4px solid #d33b27; }
-        .status.info { background: #e8f0fe; color: #1a3a52; border-left: 4px solid #1a73e8; }
-        .preview { border: 1px solid #ddd; border-radius: 8px; overflow-x: auto; margin-top: 1rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: #f0f0f0; padding: 12px; text-align: left; font-weight: 600; border-bottom: 1px solid #ddd; }
-        td { padding: 10px 12px; border-bottom: 1px solid #eee; }
-        td input { width: 100%; border: none; padding: 4px; background: transparent; font-family: inherit; }
-        td input:focus { outline: 1px solid #1a73e8; padding: 3px; }
-        .button-group { display: flex; gap: 12px; margin-top: 1.5rem; }
-        .file-info { font-size: 13px; color: #666; margin-top: 0.5rem; }
-        .loading { display: none; text-align: center; padding: 2rem; }
-        .spinner { border: 3px solid #e0e0e0; border-top: 3px solid #1a73e8; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>토박이마을 단체주문 양식 변환기</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Malgun Gothic',Arial,sans-serif; color:#222; background:#f4f5f7; padding:24px; }
+.wrap { max-width:1000px; margin:0 auto; background:#fff; border-radius:12px; padding:28px; }
+h1 { font-size:24px; margin-bottom:6px; }
+.sub { color:#666; font-size:14px; margin-bottom:28px; }
+h2 { font-size:16px; margin:28px 0 10px; }
+.drop { border:2px dashed #c8ccd4; border-radius:8px; padding:28px; text-align:center; cursor:pointer; background:#fafbfc; }
+.drop:hover { border-color:#1a73e8; background:#f0f7ff; }
+.drop b { display:block; margin-bottom:6px; }
+.drop span { font-size:13px; color:#666; }
+#fileInput { display:none; }
+textarea { width:100%; height:180px; padding:12px; border:1px solid #d0d4da; border-radius:8px; font-family:monospace; font-size:13px; }
+button { background:#1a73e8; color:#fff; border:none; padding:12px 20px; border-radius:6px; cursor:pointer; font-size:14px; margin:6px 6px 0 0; }
+button:hover { background:#1765cc; }
+button.alt { background:#fff; color:#1a73e8; border:1px solid #1a73e8; }
+#msg { padding:12px; border-radius:6px; margin-top:16px; font-size:14px; display:none; }
+#msg.ok { display:block; background:#e6f4ea; color:#0d652d; }
+#msg.no { display:block; background:#fce8e6; color:#8a1c14; }
+.tbl { overflow-x:auto; border:1px solid #e0e3e8; border-radius:8px; margin-top:12px; }
+table { border-collapse:collapse; font-size:13px; white-space:nowrap; }
+th { background:#f1f3f5; padding:10px; text-align:left; border-bottom:1px solid #e0e3e8; }
+td { padding:6px; border-bottom:1px solid #eef0f2; }
+td input { border:1px solid transparent; padding:4px 6px; font:inherit; min-width:110px; border-radius:4px; }
+td input:focus { outline:none; border-color:#1a73e8; }
+.hint { font-size:13px; color:#666; margin-bottom:8px; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🍲 토박이마을 단체주문 양식 변환기</h1>
-            <p class="subtitle">파일 또는 텍스트로 주문 데이터를 입력하고, 표준 양식으로 정렬하세요</p>
-        </div>
+<div class="wrap">
+  <h1>토박이마을 단체주문 양식 변환기</h1>
+  <p class="sub">파일을 올리거나 명단을 붙여넣으면 표준 양식 표로 정리됩니다.</p>
 
-        <div class="section">
-            <h2 class="section-title">1단계: 데이터 입력</h2>
-            
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('file')">📁 파일 업로드</button>
-                <button class="tab" onclick="switchTab('text')">📝 텍스트 입력</button>
-            </div>
+  <h2>1. 파일 올리기</h2>
+  <div class="drop" id="drop">
+    <b>여기를 클릭하거나 파일을 끌어다 놓으세요</b>
+    <span>엑셀(.xlsx, .xls), CSV, 텍스트(.txt)</span>
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.txt">
+  </div>
+  <p class="hint" id="fname"></p>
 
-            <div id="fileTab" class="tab-content
+  <h2>2. 또는 명단 붙여넣기</h2>
+  <p class="hint">카톡·문자·한글파일 내용을 그대로 붙여넣으세요. 한 줄에 한 명, 항목은 쉼표나 탭으로 구분합니다.</p>
+  <textarea id="paste" placeholder="홍길동, 26464, 강원 원주시 ○○로 12, 033-123-4567, 010-1234-5678, 감자떡 선물세트, 2, 부재시 경비실"></textarea>
+  <button onclick="fromText()">붙여넣은 내용 정리하기</button>
+  <button class="alt" onclick="addRow()">빈 줄 추가</button>
+
+  <div id="msg"></div>
+
+  <h2>3. 확인 및 수정</h2>
+  <p class="hint">칸을 직접 눌러 고칠 수 있습니다.</p>
+  <div class="tbl" id="tbl"></div>
+
+  <h2>4. 내보내기</h2>
+  <button onclick="toExcel()">엑셀로 저장</button>
+  <button class="alt" onclick="toClip()">표 전체 복사</button>
+  <button class="alt" onclick="reset()">처음부터</button>
+</div>
+
+<script>
+var COLS = ['No','주문번호','이름','우편번호','주소','전화번호','휴대폰번호','주문내용','수량','배송메시지','보내는사람 이름','보내는사람 주소','보내는사람 전화번호'];
+var rows = [];
+
+function blank(){ var o={}; COLS.forEach(function(c){ o[c]=''; }); return o; }
+
+function draw(){
+  var h = '<table><thead><tr>';
+  COLS.forEach(function(c){ h += '<th>'+c+'</th>'; });
+  h += '</tr></thead><tbody>';
+  rows.forEach(function(r,i){
+    h += '<tr>';
+    COLS.forEach(function(c){
+      var v = (r[c]==null?'':String(r[c])).replace(/"/g,'&quot;').replace(/</g,'&lt;');
+      h += '<td><input value="'+v+'" data-r="'+i+'" data-c="'+c+'"></td>';
+    });
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  document.getElementById('tbl').innerHTML = h;
+  var ins = document.getElementById('tbl').getElementsByTagName('input');
+  for (var k=0;k<ins.length;k++){
+    ins[k].onchange = function(e){
+      rows[+e.target.getAttribute('data-r')][e.target.getAttribute('data-c')] = e.target.value;
+    };
+  }
+}
+
+function renumber(){ rows.forEach(function(r,i){ r['No'] = String(i+1); }); }
+
+function say(t, ok){
+  var m = document.getElementById('msg');
+  m.textContent = t;
+  m.className = ok ? 'ok' : 'no';
+}
+
+function splitLine(line){
+  if (line.indexOf('\t') > -1) return line.split('\t');
+  return line.split(',');
+}
+
+function fromLines(text){
+  var out = [];
+  text.split(/\r?\n/).forEach(function(line){
+    if (!line.trim()) return;
+    var parts = splitLine(line);
+    if (parts.length < 2) return;
+    var r = blank();
+    var off = 0;
+    if (/^\d+$/.test(parts[0].trim()) && parts.length > COLS.length - 1) off = 1;
+    for (var i=off;i<parts.length && i-off < COLS.length-1;i++){
+      r[COLS[i-off+1]] = parts[i].trim();
+    }
+    out.push(r);
+  });
+  return out;
+}
+
+function fromText(){
+  var t = document.getElementById('paste').value;
+  if (!t.trim()){ say('붙여넣은 내용이 없습니다.', false); return; }
+  var got = fromLines(t);
+  if (!got.length){ say('읽을 수 있는 줄을 찾지 못했습니다. 항목을 쉼표로 구분해 주세요.', false); return; }
+  rows = got; renumber(); draw();
+  say(got.length + '건을 불러왔습니다. 표에서 확인하고 고쳐 주세요.', true);
+}
+
+function addRow(){ rows.push(blank()); renumber(); draw(); }
+
+function reset(){ rows = []; document.getElementById('paste').value=''; document.getElementById('fname').textContent=''; document.getElementById('msg').className=''; draw(); }
+
+function toExcel(){
+  if (!rows.length){ say('내보낼 내용이 없습니다.', false); return; }
+  var ws = XLSX.utils.json_to_sheet(rows, {header: COLS});
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '단체주문');
+  var d = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, '토박이마을_단체주문_' + d + '.xlsx');
+  say('엑셀 파일을 저장했습니다.', true);
+}
+
+function toClip(){
+  if (!rows.length){ say('복사할 내용이 없습니다.', false); return; }
+  var t = COLS.join('\t') + '\n';
+  rows.forEach(function(r){ t += COLS.map(function(c){ return r[c]||''; }).join('\t') + '\n'; });
+  var ta = document.createElement('textarea');
+  ta.value = t; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); say('표 전체를 복사했습니다.', true); }
+  catch(e){ say('복사에 실패했습니다.', false); }
+  document.body.removeChild(ta);
+}
+
+var drop = document.getElementById('drop');
+var fi = document.getElementById('fileInput');
+drop.onclick = function(){ fi.click(); };
+drop.ondragover = function(e){ e.preventDefault(); };
+drop.ondrop = function(e){ e.preventDefault(); if (e.dataTransfer.files.length){ read(e.dataTransfer.files[0]); } };
+fi.onchange = function(){ if (fi.files.length) read(fi.files[0]); };
+
+function read(file){
+  document.getElementById('fname').textContent = '선택한 파일: ' + file.name;
+  var name = file.name.toLowerCase();
+  var rd = new FileReader();
+  rd.onload = function(e){
+    try {
+      if (name.slice(-5)==='.xlsx' || name.slice(-4)==='.xls'){
+        var wb = XLSX.read(e.target.result, {type:'array'});
+        var sh = wb.Sheets[wb.SheetNames[0]];
+        var aoa = XLSX.utils.sheet_to_json(sh, {header:1, defval:''});
+        var out = [];
+        aoa.forEach(function(arr, idx){
+          var joined = arr.join('').trim();
+          if (!joined) return;
+          if (idx===0 && arr.indexOf('이름') > -1) return;
+          var r = blank();
+          var off = (/^\d+$/.test(String(arr[0]).trim()) && arr.length > COLS.length-1) ? 1 : 0;
+          for (var i=off;i<arr.length && i-off < COLS.length-1;i++){
+            r[COLS[i-off+1]] = String(arr[i]).trim();
+          }
+          out.push(r);
+        });
+        if (!out.length){ say('시트에서 내용을 찾지 못했습니다.', false); return; }
+        rows = out; renumber(); draw();
+        say(out.length + '건을 불러왔습니다.', true);
+      } else {
+        var got = fromLines(e.target.result);
+        if (!got.length){ say('읽을 수 있는 줄을 찾지 못했습니다.', false); return; }
+        rows = got; renumber(); draw();
+        say(got.length + '건을 불러왔습니다.', true);
+      }
+    } catch(err){
+      say('파일을 읽지 못했습니다: ' + err.message, false);
+    }
+  };
+  if (name.slice(-5)==='.xlsx' || name.slice(-4)==='.xls') rd.readAsArrayBuffer(file);
+  else rd.readAsText(file, 'utf-8');
+}
+
+draw();
+</script>
+</body>
+</html>
